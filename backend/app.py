@@ -45,8 +45,14 @@ def predict():
     features = features + [0] * (30 - len(features))
 
     # Prediction
-    prediction = model.predict([features])[0]
-    proba = model.predict_proba([features])[0][1]
+    try:
+        prediction = model.predict([features])[0]
+        proba = model.predict_proba([features])[0][1]
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({
+            "error": str(e)
+        })
 
     result = "Phishing" if prediction == 1 else "Safe"
     risk = round(proba * 100, 2)
