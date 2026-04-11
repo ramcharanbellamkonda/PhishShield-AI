@@ -1,7 +1,7 @@
-window.onload = async () => {
+document.getElementById("check").addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  let response = await fetch("http://127.0.0.1:5000/predict", {
+  let response = await fetch("https://phishing-detector-2-twni.onrender.com/predict", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -18,4 +18,4 @@ window.onload = async () => {
   resultEl.className = data.result === "Phishing" ? "phishing" : "safe";
 
   detailsEl.innerText = data.reason;
-};
+});
