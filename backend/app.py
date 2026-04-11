@@ -8,12 +8,12 @@ from features import extract_features
 app = Flask(__name__)
 CORS(app)
 
-# Load model correctly (works in Render + local)
+# Load model
 base_dir = os.path.dirname(__file__)
 model_path = os.path.join(base_dir, "model", "model.pkl")
 model = joblib.load(model_path)
 
-# Feature names (from dataset)
+# Feature names (30)
 feature_names = [
     'having_IPhaving_IP_Address', 'URLURL_Length', 'Shortining_Service',
     'having_At_Symbol', 'double_slash_redirecting',
@@ -26,38 +26,27 @@ feature_names = [
     'Links_pointing_to_page', 'Statistical_report'
 ]
 
-# Home route
 @app.route("/")
 def home():
     return "API is running"
 
-
-# Prediction route
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.json
     url = data.get("url", "")
 
-    print("Received URL:", url)
-
     try:
-        # Extract features
         features = extract_features(url)
-
-        # Pad to match 30 features
         features = features + [0] * (30 - len(features))
 
-        # Convert to DataFrame (fix warning)
         df = pd.DataFrame([features], columns=feature_names)
 
-        # Prediction
         prediction = model.predict(df)[0]
         proba = model.predict_proba(df)[0][1]
 
         result = "Phishing" if prediction == 1 else "Safe"
         risk = round(proba * 100, 2)
 
-        # Explanation
         reasons = []
         if "@" in url:
             reasons.append("Contains @ symbol")
@@ -78,11 +67,7 @@ def predict():
         })
 
     except Exception as e:
-        print("ERROR:", e)
-        return jsonify({
-            "error": str(e)
-        })
-
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
