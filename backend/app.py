@@ -36,6 +36,7 @@ def home():
 def predict():
     data = request.json
     url = data.get("url", "")
+    print("Received URL:", url) 
 
     # Extract features
     features = extract_features(url)
