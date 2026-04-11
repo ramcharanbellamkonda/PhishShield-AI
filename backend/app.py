@@ -2,12 +2,16 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import re
+import os
 
 app = Flask(__name__)
 CORS(app)  # allow extension to access API
 
 # Load trained model
-model = joblib.load("model/model.pkl")
+base_dir = os.path.dirname(__file__)
+model_path = os.path.join(base_dir, "model", "model.pkl")
+
+model = joblib.load(model_path)
 
 
 # Feature extraction (basic version)
