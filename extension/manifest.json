@@ -1,9 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Phishing Detector",
+  "name": "AI Phishing Detector",
   "version": "1.0",
-  "description": "Detect phishing websites using AI",
-  "permissions": ["tabs"],
+  "description": "Detect phishing websites using AI.",
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:5000/*"
+  ],
   "action": {
     "default_popup": "popup.html"
   }

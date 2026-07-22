@@ -1,21 +1,84 @@
-document.getElementById("check").addEventListener("click", async () => {
-  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+let currentURL = "";
 
-  let response = await fetch("https://phishing-detector-2-twni.onrender.com/predict", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ url: tab.url })
-  });
+chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
-  let data = await response.json();
+    currentURL = tabs[0].url;
 
-  let resultEl = document.getElementById("result");
-  let detailsEl = document.getElementById("details");
+    document.getElementById("url").innerHTML = currentURL;
 
-  resultEl.innerText = `${data.result} (${data.risk}%)`;
-  resultEl.className = data.result === "Phishing" ? "phishing" : "safe";
+});
 
-  detailsEl.innerText = data.reason;
+document.getElementById("scanBtn").addEventListener("click", async () => {
+
+    const result = document.getElementById("result");
+
+    // Don't scan Chrome internal pages
+    if (
+        currentURL.startsWith("chrome://") ||
+        currentURL.startsWith("edge://") ||
+        currentURL.startsWith("about:") ||
+        currentURL.startsWith("chrome-extension://")
+    ) {
+
+        result.innerHTML = "⚠ Open a website first.";
+
+        result.style.color = "orange";
+
+        return;
+    }
+
+    result.innerHTML = "🔄 Scanning...";
+
+    result.style.color = "#3b82f6";
+
+    try {
+
+        const response = await fetch("http://127.0.0.1:5000/predict", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                url: currentURL
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (data.prediction === "Legitimate") {
+
+            result.innerHTML = `
+                🟢 <b>SAFE</b><br><br>
+                Confidence : ${data.confidence}%<br>
+                Risk : ${data.risk}
+            `;
+
+            result.style.color = "#22c55e";
+
+        } else {
+
+            result.innerHTML = `
+                🔴 <b>PHISHING</b><br><br>
+                Confidence : ${data.confidence}%<br>
+                Risk : ${data.risk}
+            `;
+
+            result.style.color = "#ef4444";
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        result.innerHTML = "❌ Flask Server Not Running";
+
+        result.style.color = "red";
+
+    }
+
 });

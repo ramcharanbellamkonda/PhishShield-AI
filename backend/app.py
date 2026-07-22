@@ -1,80 +1,146 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import joblib
 import os
-import pandas as pd
+import re
+from urllib.parse import urlparse
+
 from features import extract_features
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-@app.after_request
-def add_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    return response
+CORS(app)
 
-# Load model
-base_dir = os.path.dirname(__file__)
-model_path = os.path.join(base_dir, "model", "model.pkl")
-model = joblib.load(model_path)
+BASE_DIR = os.path.dirname(__file__)
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
 
-# Feature names (30)
-feature_names = [
-    'having_IPhaving_IP_Address', 'URLURL_Length', 'Shortining_Service',
-    'having_At_Symbol', 'double_slash_redirecting',
-    'Prefix_Suffix', 'having_Sub_Domain', 'SSLfinal_State',
-    'Domain_registeration_length', 'Favicon', 'port', 'HTTPS_token',
-    'Request_URL', 'URL_of_Anchor', 'Links_in_tags', 'SFH',
-    'Submitting_to_email', 'Abnormal_URL', 'Redirect', 'on_mouseover',
-    'RightClick', 'popUpWidnow', 'Iframe', 'age_of_domain',
-    'DNSRecord', 'web_traffic', 'Page_Rank', 'Google_Index',
-    'Links_pointing_to_page', 'Statistical_report'
+model = joblib.load(MODEL_PATH)
+
+TRUSTED_DOMAINS = [
+    "google.com",
+    "github.com",
+    "facebook.com",
+    "instagram.com",
+    "whatsapp.com",
+    "linkedin.com",
+    "x.com",
+    "twitter.com",
+    "youtube.com",
+    "reddit.com",
+    "amazon.com",
+    "amazon.in",
+    "flipkart.com",
+    "apple.com",
+    "microsoft.com",
+    "openai.com",
+    "netflix.com",
+    "wikipedia.org"
 ]
+
+SUSPICIOUS_WORDS = [
+    "login",
+    "verify",
+    "update",
+    "secure",
+    "account",
+    "bank",
+    "paypal",
+    "password",
+    "confirm"
+]
+
 
 @app.route("/")
 def home():
-    return "API is running"
+    return render_template("index.html")
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.json
-    url = data.get("url", "")
 
-    try:
-        features = extract_features(url)
-        features = features + [0] * (30 - len(features))
+    data = request.get_json()
 
-        df = pd.DataFrame([features], columns=feature_names)
+    url = data.get("url", "").strip()
 
-        prediction = model.predict(df)[0]
-        proba = model.predict_proba(df)[0][1]
+    if url == "":
+        return jsonify({"error": "Enter URL"}), 400
 
-        result = "Phishing" if prediction == 1 else "Safe"
-        risk = round(proba * 100, 2)
+    if not url.startswith("http://") and not url.startswith("https://"):
+        url = "https://" + url
 
-        reasons = []
-        if "@" in url:
-            reasons.append("Contains @ symbol")
-        if "-" in url:
-            reasons.append("Contains hyphen")
-        if len(url) > 75:
-            reasons.append("URL is too long")
-        if url.count('.') > 3:
-            reasons.append("Too many subdomains")
+    features = extract_features(url)
 
-        reason_text = ", ".join(reasons) if reasons else "No obvious risk detected"
+    pred = model.predict([features])[0]
+    prob = model.predict_proba([features])[0]
 
-        return jsonify({
-            "url": url,
-            "result": result,
-            "risk": risk,
-            "reason": reason_text
-        })
+    if pred == 1:
+        prediction = "Phishing"
+        confidence = round(prob[1] * 100, 2)
+    else:
+        prediction = "Legitimate"
+        confidence = round(prob[0] * 100, 2)
 
-    except Exception as e:
-        return jsonify({"error": str(e)})
+    parsed = urlparse(url)
+
+    domain = parsed.netloc.lower().replace("www.", "")
+
+    protocol = parsed.scheme.upper()
+
+    subdomain = "None"
+
+    parts = domain.split(".")
+
+    if len(parts) > 2:
+        subdomain = parts[0]
+
+    analysis = []
+
+    if parsed.scheme == "https":
+        analysis.append("HTTPS Enabled")
+    else:
+        analysis.append("Uses HTTP")
+
+    ip = bool(re.search(r"\d+\.\d+\.\d+\.\d+", domain))
+
+    if ip:
+        analysis.append("Uses IP Address")
+    else:
+        analysis.append("No IP Address")
+
+    words = [w for w in SUSPICIOUS_WORDS if w in url.lower()]
+
+    if words:
+        analysis.append("Suspicious Words : " + ", ".join(words))
+    else:
+        analysis.append("No Suspicious Keywords")
+
+    trusted = False
+
+    for d in TRUSTED_DOMAINS:
+        if domain == d or domain.endswith("." + d):
+            trusted = True
+            break
+
+    if trusted:
+        prediction = "Legitimate"
+        confidence = max(confidence, 98)
+        risk = "Low"
+        analysis.append("Trusted Domain")
+    else:
+        risk = "High" if prediction == "Phishing" else "Medium"
+
+    return jsonify({
+        "prediction": prediction,
+        "confidence": confidence,
+        "risk": risk,
+        "analysis": analysis,
+        "url_info": {
+            "protocol": protocol,
+            "domain": domain,
+            "subdomain": subdomain,
+            "length": len(url)
+        }
+    })
+
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
