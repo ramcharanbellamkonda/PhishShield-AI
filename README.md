@@ -1,13 +1,16 @@
-# 🛡️ PhishShield AI
+# 🛡️ PhishShield-AI
 
-> AI-powered phishing website detection using Machine Learning, Flask, and a Chrome Extension.
+An AI-powered phishing website detection system that analyzes URLs using Machine Learning and provides real-time protection through a Chrome Extension.
 
-Detect malicious websites in real time with an intelligent URL analysis system.
+## 🌐 Live Demo
+
+https://phishshield-ai-psjv.onrender.com
 
 ---
 
-⭐ Features | 🚀 Fast Predictions | 🔒 Cyber Security | 🧩 Chrome Extension
+## ✨ Features
 
+<<<<<<< HEAD
 ## 🌐 Live Demo
 
 🚀 Try the live application here:
@@ -43,6 +46,15 @@ Render
 - ⚡ Fast predictions
 - 🎨 Modern responsive UI
 - 📄 Download scan reports
+=======
+- 🔍 Real-time phishing detection
+- 🤖 Machine Learning (Random Forest)
+- 🌐 Chrome Extension
+- 📊 Confidence Score
+- ⚠️ Risk Level Detection
+- 🚀 Flask REST API
+- ☁️ Live Deployment on Render
+>>>>>>> 8a65028 (Make live demo link clickable)
 
 ---
 Architecture Diagram
@@ -78,7 +90,6 @@ Sample API Response
   "risk":"Low"
 }
 
-
 ---
 
 ### 5. Live Demo clickable
@@ -91,25 +102,15 @@ Instead of plain URL:
 🔗 **https://phishshield-ai-psjv.onrender.com**
 ## 🛠️ Tech Stack
 
-### Backend
 - Python
 - Flask
 - Scikit-learn
-- Pandas
-- NumPy
-
-### Machine Learning
 - Random Forest
-- Feature Engineering
-- URL Analysis
-
-### Frontend
 - HTML
 - CSS
 - JavaScript
-
-### Browser Extension
-- Chrome Extension API
+- Chrome Extension
+- Render
 
 ---
 
@@ -120,78 +121,34 @@ PhishShield-AI/
 │
 ├── backend/
 │   ├── app.py
-│   ├── features.py
-│   ├── train_model.py
-│   ├── requirements.txt
 │   ├── model/
-│   ├── static/
-│   └── templates/
+│   ├── features.py
+│   └── requirements.txt
 │
 ├── extension/
-│
-├── dataset/
+│   ├── manifest.json
+│   ├── popup.html
+│   ├── popup.js
+│   └── style.css
 │
 ├── screenshots/
-│
-├── README.md
-│
-└── LICENSE
+└── README.md
 ```
 
 ---
 
-## 🧠 Machine Learning
-
-The model extracts multiple URL-based features including:
-
-- URL Length
-- Domain Length
-- HTTPS Usage
-- HTTP Usage
-- Number of Digits
-- Number of Subdomains
-- Special Characters
-- Entropy
-- Suspicious Keywords
-- Suspicious TLD
-- IP Address Detection
-- URL Shortener Detection
-- Path Depth
-- Query Parameters
-- Uppercase Ratio
-
-The extracted features are classified using a Random Forest model.
-
----
-
-## ⚙️ Installation
-
-Clone the repository
+## 🚀 Installation
 
 ```bash
 git clone https://github.com/ramcharanbellamkonda/PhishShield-AI.git
-```
-
-Go into backend
-
-```bash
 cd PhishShield-AI/backend
-```
-
-Install dependencies
-
-```bash
 pip install -r requirements.txt
-```
-
-Run
-
-```bash
 python app.py
 ```
 
 ---
 
+<<<<<<< HEAD
 ## 🌍 API Endpoint
 
 POST
@@ -234,6 +191,8 @@ GitHub: https://github.com/ramcharanbellamkonda
 If you like this project, consider giving it a ⭐ on GitHub.
 
 
+=======
+>>>>>>> 8a65028 (Make live demo link clickable)
 ## 📸 Screenshots
 
 ### 🏠 Home Page
@@ -250,3 +209,41 @@ If you like this project, consider giving it a ⭐ on GitHub.
 
 ### 📄 Scan Report
 ![Report](screenshots/report.png)
+
+
+## 🤖 Machine Learning
+
+Model Used:
+
+- Random Forest Classifier
+
+Dataset:
+
+- Phishing URLs
+- Legitimate URLs
+
+Prediction Output:
+
+- Safe
+- Phishing
+
+Confidence Score
+
+Risk Level
+
+---
+
+## 👨‍💻 Author
+
+Ramcharan Bellamkonda
+
+GitHub:
+https://github.com/ramcharanbellamkonda
+
+---
+
+## 📜 License
+
+MIT License
+
+
