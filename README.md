@@ -1,7 +1,20 @@
 # 🛡️ PhishShield AI
 
-An AI-powered phishing website detection system that analyzes URLs using Machine Learning and identifies whether a website is **Legitimate** or **Phishing** in real time.
+> AI-powered phishing website detection using Machine Learning, Flask, and a Chrome Extension.
 
+Detect malicious websites in real time with an intelligent URL analysis system.
+
+---
+
+⭐ Features | 🚀 Fast Predictions | 🔒 Cyber Security | 🧩 Chrome Extension
+
+
+![Python](https://img.shields.io/badge/Python-3.13-blue)
+![Flask](https://img.shields.io/badge/Flask-Web%20Framework-black)
+![Machine Learning](https://img.shields.io/badge/Machine-Learning-green)
+![Random Forest](https://img.shields.io/badge/RandomForest-Classifier-orange)
+![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-yellow)
+![License](https://img.shields.io/badge/License-MIT-brightgreen)
 ## 🚀 Features
 
 - 🔍 Detects phishing websites using Machine Learning
