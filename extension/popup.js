@@ -33,7 +33,7 @@ document.getElementById("scanBtn").addEventListener("click", async () => {
 
     try {
 
-        const response = await fetch("http://127.0.0.1:5000/predict", {
+        const response = await fetch("https://phishshield-ai-psjv.onrender.com/predict", {
 
             method: "POST",
 
